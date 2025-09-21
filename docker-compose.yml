@@ -1,0 +1,32 @@
+version: '3.4'
+
+services:
+  staffmanagementsystem.api:
+    container_name: staff-management-api
+    image: ${DOCKER_REGISTRY-}staffmanagementsystemapi
+    build:
+      context: .
+      dockerfile: StaffManagementSystem/Dockerfile
+    ports:
+      - "5000:8080"   # API exposed at http://localhost:5000
+    depends_on:
+      - staffmanagementdb
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Host=staffmanagementdb;Port=5432;Database=StaffManagementSystem;Username=staffuser;Password=staffpass
+
+  staffmanagementdb: 
+    container_name: staff-management-db
+    image: postgres:16
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=staffuser
+      - POSTGRES_PASSWORD=staffpass
+      - POSTGRES_DB=StaffManagementSystem
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

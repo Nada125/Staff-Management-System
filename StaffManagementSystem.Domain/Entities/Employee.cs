@@ -9,7 +9,6 @@ namespace StaffManagementSystem.Domain.Entities
 {
     public class Employee : IdentityUser
     {
-        public string Name { get; set; } = string.Empty;
         public string Position { get; set; } = string.Empty;
         public decimal Salary { get; set; }
         public ICollection<EmployeeTask>? Tasks { get; set; } 

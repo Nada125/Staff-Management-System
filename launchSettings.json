@@ -5,6 +5,10 @@
       "commandVersion": "1.0",
       "serviceActions": {
         "staffmanagementsystem.api": "StartDebugging"
+      },
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ConnectionStrings__DefaultConnection": "Host=staffmanagementdb;Port=5432;Database=StaffManagementSystem;Username=staffuser;Password=staffpass"
       }
     }
   }

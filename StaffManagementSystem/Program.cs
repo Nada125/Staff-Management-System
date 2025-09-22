@@ -1,5 +1,11 @@
 using Microsoft.EntityFrameworkCore;
+using AutoMapper;
+using Microsoft.Extensions.DependencyInjection;
+using StaffManagementSystem.Application.Interfaces;
+using StaffManagementSystem.Application.Mappings;
 using StaffManagementSystem.Infrastructures.DBContext;
+using StaffManagementSystem.Infrastructures.Repositories;
+using StaffManagementSystem.Application.Services;
 
 namespace StaffManagementSystem
 {
@@ -16,11 +22,22 @@ namespace StaffManagementSystem
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
-            var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
-                                   ?? Environment.GetEnvironmentVariable("CONNECTIONSTRINGS__DEFAULTCONNECTION");
+            builder.Services.AddAutoMapper(typeof(EmployeeProfile).Assembly);
+            builder.Services.AddScoped(typeof(IGenericRepository<,>), typeof(GenericRepository<,>));
+            builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+            builder.Services.AddScoped<IEmployeeService, EmployeeService>();
+            builder.Services.AddScoped<IEmployeeTaskService, EmployeeTaskService>();
+            builder.Services.AddScoped<IReportService, ReportService>();
+
+
+            var connectionString = Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection")
+                       ?? builder.Configuration.GetConnectionString("DefaultConnection");
 
             builder.Services.AddDbContext<AppDbContext>(options =>
                 options.UseNpgsql(connectionString));
+
+
+
 
             var app = builder.Build();
 

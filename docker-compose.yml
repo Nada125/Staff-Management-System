@@ -1,5 +1,7 @@
 version: '3.4'
-
+networks:
+    staffmanagement:
+   
 services:
   staffmanagementsystem.api:
     container_name: staff-management-api
@@ -14,7 +16,8 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Host=staffmanagementdb;Port=5432;Database=StaffManagementSystem;Username=staffuser;Password=staffpass
-
+    networks:
+      - staffmanagement
   staffmanagementdb: 
     container_name: staff-management-db
     image: postgres:16
@@ -25,6 +28,8 @@ services:
       - POSTGRES_USER=staffuser
       - POSTGRES_PASSWORD=staffpass
       - POSTGRES_DB=StaffManagementSystem
+    networks:
+      - staffmanagement
     volumes:
       - postgres_data:/var/lib/postgresql/data
 

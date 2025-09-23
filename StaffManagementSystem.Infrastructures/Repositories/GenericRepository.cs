@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using StaffManagementSystem.Application.Interfaces;
-using StaffManagementSystem.Domain.Entities;
 using StaffManagementSystem.Infrastructures.DBContext;
 
 namespace StaffManagementSystem.Infrastructures.Repositories
 {
-    public class GenericRepository<T> : IGenericRepository<T> where T : class
+    public class GenericRepository<T, TKey> : IGenericRepository<T, TKey> where T : class
     {
         private readonly AppDbContext _context;
         private readonly DbSet<T> _dbSet;
@@ -20,7 +14,7 @@ namespace StaffManagementSystem.Infrastructures.Repositories
             _context = context;
             _dbSet = context.Set<T>();
         }
-        public async Task<T?> Get(int Id)
+        public async Task<T?> Get(TKey Id)
         {
             return await _dbSet.FindAsync(Id);
         }
@@ -43,7 +37,19 @@ namespace StaffManagementSystem.Infrastructures.Repositories
             return entity;
         }
 
-        public async Task Delete(int Id)
+        public async Task<T?> Patch(TKey id, Action<T> patchAction) 
+        {
+            var entity = await Get(id);
+            if (entity == null) return null;
+
+            patchAction(entity); 
+            _context.Update(entity);
+            await _context.SaveChangesAsync();
+
+            return entity;
+        }
+
+        public async Task Delete(TKey Id)
         {
             var entity = await Get(Id);
             if (entity != null)

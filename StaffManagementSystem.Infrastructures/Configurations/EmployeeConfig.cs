@@ -13,7 +13,7 @@ namespace StaffManagementSystem.Infrastructures.Configurations
     {
         public void Configure(EntityTypeBuilder<Employee> builder)
         {
-            builder.Property(p => p.Name)
+            builder.Property(p => p.UserName)
                    .IsRequired()
                    .HasMaxLength(20);
 

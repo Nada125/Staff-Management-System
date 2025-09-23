@@ -37,6 +37,15 @@ namespace StaffManagementSystem
                 options.UseNpgsql(connectionString));
 
 
+            builder.Services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(policy =>
+                {
+                    policy.AllowAnyOrigin()
+                          .AllowAnyHeader()
+                          .AllowAnyMethod();
+                });
+            });
 
 
             var app = builder.Build();
@@ -65,8 +74,11 @@ namespace StaffManagementSystem
                 app.UseSwaggerUI();
             }
 
-            app.UseHttpsRedirection();
-
+            if (!app.Environment.IsDevelopment())
+            {
+                app.UseHttpsRedirection();
+            }
+            app.UseCors();
             app.UseAuthorization();
 
 

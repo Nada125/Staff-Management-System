@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using StaffManagementSystem.Application.DTOs.EmployeeTasks;
 using StaffManagementSystem.Application.Interfaces;
 
@@ -15,6 +16,7 @@ namespace StaffManagementSystem.API.Controllers
             _taskService = taskService;
         }
 
+        [Authorize]
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -22,6 +24,7 @@ namespace StaffManagementSystem.API.Controllers
             return Success(tasks, "Tasks retrieved successfully");
         }
 
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
@@ -29,6 +32,8 @@ namespace StaffManagementSystem.API.Controllers
             return task == null ? Error("Task not found", 404) : Success(task, "Task retrieved successfully");
         }
 
+
+        [Authorize(Roles = "Manager")]
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] EmployeeTaskRequest request)
         {
@@ -47,6 +52,7 @@ namespace StaffManagementSystem.API.Controllers
             return Success(response, "Task created successfully");
         }
 
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] EmployeeTaskRequest request)
         {
@@ -54,6 +60,7 @@ namespace StaffManagementSystem.API.Controllers
             return response == null ? Error("Task not found", 404) : Success(response, "Task updated successfully");
         }
 
+        [Authorize]
         [HttpPatch("{id}")]
         public async Task<IActionResult> Patch(int id, [FromBody] EmployeeTaskRequest request)
         {
@@ -61,6 +68,8 @@ namespace StaffManagementSystem.API.Controllers
             return response == null ? Error("Task not found", 404) : Success(response, "Task patched successfully");
         }
 
+
+        [Authorize(Roles = "Manager")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {

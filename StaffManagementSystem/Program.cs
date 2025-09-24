@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using AutoMapper;
 using StaffManagementSystem.Application.Interfaces;
 using StaffManagementSystem.Application.Mappings;
 using StaffManagementSystem.Infrastructures.DBContext;
@@ -89,17 +88,6 @@ namespace StaffManagementSystem
             builder.Services.AddScoped<IEmailService, EmailService>();
 
 
-
-            //var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
-            //    ?? Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection");
-
-            var connectionString = Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection")
-                ?? builder.Configuration.GetConnectionString("DefaultConnection");
-
-            builder.Services.AddDbContext<AppDbContext>(options =>
-                options.UseNpgsql(connectionString));
-
-
             builder.Services.AddAuthentication(options =>
             {
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -139,25 +127,61 @@ namespace StaffManagementSystem
                 });
             });
 
+            //var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+            //    ?? Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection");
+
+            var connectionString = Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection")
+                                   ?? builder.Configuration.GetConnectionString("DefaultConnection");
+
+            if (string.IsNullOrWhiteSpace(connectionString))
+            {
+                throw new InvalidOperationException("Database connection string not found!");
+            }
+
+
+            builder.Services.AddDbContext<AppDbContext>(options =>
+            options.UseNpgsql(connectionString, npgsqlOptions =>
+            {
+                // Retry up to 5 times, max delay 10 seconds between retries
+                npgsqlOptions.EnableRetryOnFailure(
+                maxRetryCount: 5,
+                maxRetryDelay: TimeSpan.FromSeconds(10),
+                errorCodesToAdd: null);
+            }));
 
             var app = builder.Build();
 
-            // Update-Database
-            var scope = app.Services.CreateScope(); 
-            var services = scope.ServiceProvider;  
-            var _dbContext = services.GetRequiredService<AppDbContext>(); 
-            var loggerFactory = services.GetRequiredService<ILoggerFactory>(); 
 
-            try
+            // Update-Database with retry
+            using (var scope = app.Services.CreateAsyncScope())
             {
-                _dbContext.Database.Migrate();
-            }
-            catch (Exception ex)
-            {
-                var logger = loggerFactory.CreateLogger<Program>();
-                logger.LogError(ex, "there is an error occuired when applying Migration");
+                var services = scope.ServiceProvider;
+                var _dbContext = services.GetRequiredService<AppDbContext>();
+                var loggerFactory = services.GetRequiredService<ILoggerFactory>();
+
+
+                var retries = 3;
+                for (int attempt = 1; attempt <= retries; attempt++)
+                {
+                    try
+                    {
+                       await _dbContext.Database.MigrateAsync();
+                        break; 
+                    }
+                    catch (Exception ex)
+                    {
+                        var logger = loggerFactory.CreateLogger<Program>();
+                        logger.LogError(ex, "Error applying migration. Attempt {Attempt} of {Retries}", attempt, retries);
+
+                        if (attempt == retries) throw; 
+                        await Task.Delay(2000); 
+                    }
+                }
+
             }
 
+
+            // Seeding Roles
             using (var s = app.Services.CreateScope())
             {
                 var roleManager = s.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();

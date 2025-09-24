@@ -8,6 +8,8 @@ namespace StaffManagementSystem.Application.DTOs.Employee
         public string Email { get; set; } = string.Empty;
         public string PhoneNumber { get; set; } = string.Empty;
         public string Position { get; set; } = string.Empty;
+        public string Nationality { get; set; } = string.Empty;
+        public string NationalId { get; set; } = string.Empty;
         public decimal Salary { get; set; }
         public ICollection<EmployeeTaskResponse>? Tasks { get; set; }
 

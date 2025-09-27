@@ -10,21 +10,21 @@ namespace StaffManagementSystem.API.Controllers
     public class ReportController : BaseController
     {
         private readonly IReportService _reportService;
+        private readonly IReportAiService _aiService;
 
-        public ReportController(IReportService reportService)
+        public ReportController(IReportService reportService, IReportAiService aiService)
         {
             _reportService = reportService;
+            _aiService = aiService;
         }
 
-
-        [Authorize(Roles ="Manager")]
+        [Authorize(Roles = "Manager")]
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
             var response = await _reportService.GetAllReportsAsync();
             return Success(response, "Reports retrieved successfully");
         }
-
 
         [Authorize]
         [HttpGet("{id}")]
@@ -36,7 +36,6 @@ namespace StaffManagementSystem.API.Controllers
 
             return Success(response, "Report retrieved successfully");
         }
-
 
         [Authorize]
         [HttpPost]
@@ -55,9 +54,11 @@ namespace StaffManagementSystem.API.Controllers
             }
 
             var response = await _reportService.CreateReportAsync(request);
-            return Success(response, "Report created successfully");
-        }
 
+            var summary = await _aiService.SummarizeAsync(request.Content);
+
+            return Success(new {response}, "Report created successfully with AI summary");
+        }
 
         [Authorize]
         [HttpPut("{id}")]
@@ -70,7 +71,6 @@ namespace StaffManagementSystem.API.Controllers
             return Success(response, "Report updated successfully");
         }
 
-
         [Authorize]
         [HttpPatch("{id}")]
         public async Task<IActionResult> Patch(int id, [FromBody] ReportRequest request)
@@ -81,7 +81,6 @@ namespace StaffManagementSystem.API.Controllers
 
             return Success(response, "Report patched successfully");
         }
-
 
         [Authorize]
         [HttpDelete("{id}")]

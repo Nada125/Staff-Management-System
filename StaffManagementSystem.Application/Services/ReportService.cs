@@ -8,13 +8,16 @@ namespace StaffManagementSystem.Application.Services
     public class ReportService : IReportService
     {
         private readonly IGenericRepository<Report, int> _reportRepo;
+        private readonly IReportAiService _aiService;
         private readonly IMapper _mapper;
 
         public ReportService(
             IGenericRepository<Report, int> reportRepo,
+            IReportAiService aiService,
             IMapper mapper)
         {
             _reportRepo = reportRepo;
+            _aiService = aiService;
             _mapper = mapper;
         }
 
@@ -33,6 +36,7 @@ namespace StaffManagementSystem.Application.Services
         public async Task<ReportResponse> CreateReportAsync(ReportRequest request)
         {
             var report = _mapper.Map<Report>(request);
+            report.Summary = await _aiService.SummarizeAsync(report.Content);
             await _reportRepo.Add(report);
             return _mapper.Map<ReportResponse>(report);
         }
@@ -43,6 +47,10 @@ namespace StaffManagementSystem.Application.Services
             if (report == null) return null;
 
             _mapper.Map(request, report);
+            if (!string.IsNullOrWhiteSpace(request.Content))
+            {
+                report.Summary = await _aiService.SummarizeAsync(report.Content);
+            }
             await _reportRepo.Update(report);
 
             return _mapper.Map<ReportResponse>(report);
@@ -50,23 +58,34 @@ namespace StaffManagementSystem.Application.Services
 
         public async Task<ReportResponse?> PatchReportAsync(int id, ReportRequest request)
         {
-            var report = await _reportRepo.Patch(id, r =>
+            var report = await _reportRepo.Get(id);
+            if (report == null) return null;
+
+            bool contentChanged = false;
+
+            if (!string.IsNullOrWhiteSpace(request.Content))
             {
-                if (!string.IsNullOrWhiteSpace(request.Summary))
-                    r.Summary = request.Summary;
+                report.Content = request.Content;
+                contentChanged = true;
+            }
 
-                if (!string.IsNullOrWhiteSpace(request.Content))
-                    r.Content = request.Content;
+            if (!string.IsNullOrWhiteSpace(request.EmployeeId))
+                report.EmployeeId = request.EmployeeId;
 
-                if (request.SubmittedAt != default)
-                    r.SubmittedAt = request.SubmittedAt;
+            if (request.SubmittedAt != default)
+                report.SubmittedAt = request.SubmittedAt;
 
-                if (!string.IsNullOrWhiteSpace(request.EmployeeId))
-                    r.EmployeeId = request.EmployeeId;
-            });
+            if (contentChanged)
+            {
+                report.Summary = await _aiService.SummarizeAsync(report.Content);
+            }
 
-            return report == null ? null : _mapper.Map<ReportResponse>(report);
+            await _reportRepo.Update(report);
+
+            return _mapper.Map<ReportResponse>(report);
         }
+
+
 
         public async Task<bool> DeleteReportAsync(int id)
         {

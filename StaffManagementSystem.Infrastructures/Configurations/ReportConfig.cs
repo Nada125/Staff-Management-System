@@ -17,6 +17,10 @@ namespace StaffManagementSystem.Infrastructures.Configurations
                    .IsRequired()
                    .HasMaxLength(100);
 
+            builder.Property(p => p.Content)
+                  .IsRequired()
+                  .HasColumnType("text");
+
             builder.HasOne(p => p.Employee)
                    .WithMany(c => c.Reports)
                    .HasForeignKey(p => p.EmployeeId)

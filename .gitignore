@@ -9,6 +9,9 @@ obj/
 Debug/
 Release/
 
+# Secrets
+secrets/
+
 # Others
 *.log
 *.db

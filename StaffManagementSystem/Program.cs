@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
+
 namespace StaffManagementSystem
 {
     public class Program
@@ -19,8 +20,6 @@ namespace StaffManagementSystem
         public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-
-            // Add services to the container.
 
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -86,6 +85,14 @@ namespace StaffManagementSystem
             builder.Services.AddScoped<IReportService, ReportService>();
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<IEmailService, EmailService>();
+            builder.Services.AddScoped<IReportAiService, ReportAiService>();
+
+            // Bind Google AI config
+            builder.Services.Configure<GoogleAiOptions>(builder.Configuration.GetSection("GoogleAI"));
+
+            // Register HttpClient for Google AI
+            builder.Services.AddHttpClient("google-ai");
+
 
 
             builder.Services.AddAuthentication(options =>

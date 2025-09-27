@@ -1,6 +1,4 @@
-﻿
-
-namespace StaffManagementSystem.Application.Interfaces
+﻿namespace StaffManagementSystem.Application.Interfaces
 {
     public interface IGenericRepository<T, TKey> where T : class
     {

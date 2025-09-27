@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using StaffManagementSystem.API.Controllers;
 using StaffManagementSystem.Application.DTOs.Employee;
 using StaffManagementSystem.Application.Interfaces;
+
 
 [ApiController]
 [Route("api/[controller]")]
@@ -14,6 +16,8 @@ public class EmployeeController : BaseController
         _employeeService = employeeService;
     }
 
+
+    [Authorize(Roles ="Manager")]
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
@@ -21,6 +25,8 @@ public class EmployeeController : BaseController
         return Success(employees, "Employees retrieved successfully");
     }
 
+
+    [Authorize]
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(string id)
     {
@@ -28,6 +34,8 @@ public class EmployeeController : BaseController
         return employee == null ? Error("Employee not found", 404) : Success(employee, "Employee retrieved successfully");
     }
 
+
+    [Authorize]
     [HttpGet("Task/{id}")]
     public async Task<IActionResult> GetEmployeeWithTasks(string id)
     {
@@ -35,6 +43,8 @@ public class EmployeeController : BaseController
         return employee == null ? Error("Employee not found", 404) : Success(employee, "Employee retrieved successfully");
     }
 
+
+    [Authorize(Roles = "Manager")]
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] EmployeeRequest request)
     {
@@ -53,6 +63,8 @@ public class EmployeeController : BaseController
         return Success(response, "Employee created successfully");
     }
 
+
+    [Authorize(Roles = "Manager")]
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(string id, [FromBody] EmployeeRequest request)
     {
@@ -60,6 +72,8 @@ public class EmployeeController : BaseController
         return response == null ? Error("Employee not found", 404) : Success(response, "Employee updated successfully");
     }
 
+
+    [Authorize(Roles = "Manager")]
     [HttpPatch("{id}")]
     public async Task<IActionResult> Patch(string id, [FromBody] EmployeeRequest request)
     {
@@ -67,6 +81,8 @@ public class EmployeeController : BaseController
         return response == null ? Error("Employee not found", 404) : Success(response, "Employee patched successfully");
     }
 
+
+    [Authorize(Roles = "Manager")]
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(string id)
     {

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using StaffManagementSystem.Application.DTOs.Report;
 using StaffManagementSystem.Application.Interfaces;
 
@@ -9,13 +10,15 @@ namespace StaffManagementSystem.API.Controllers
     public class ReportController : BaseController
     {
         private readonly IReportService _reportService;
+        private readonly IReportAiService _aiService;
 
-        public ReportController(IReportService reportService)
+        public ReportController(IReportService reportService, IReportAiService aiService)
         {
             _reportService = reportService;
+            _aiService = aiService;
         }
 
-        // GET: api/report
+        [Authorize(Roles = "Manager")]
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -23,7 +26,7 @@ namespace StaffManagementSystem.API.Controllers
             return Success(response, "Reports retrieved successfully");
         }
 
-        // GET api/report/{id}
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
@@ -34,7 +37,7 @@ namespace StaffManagementSystem.API.Controllers
             return Success(response, "Report retrieved successfully");
         }
 
-        // POST api/report
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] ReportRequest request)
         {
@@ -51,10 +54,13 @@ namespace StaffManagementSystem.API.Controllers
             }
 
             var response = await _reportService.CreateReportAsync(request);
-            return Success(response, "Report created successfully");
+
+            var summary = await _aiService.SummarizeAsync(request.Content);
+
+            return Success(new {response}, "Report created successfully with AI summary");
         }
 
-        // PUT api/report/{id}
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] ReportRequest request)
         {
@@ -65,7 +71,7 @@ namespace StaffManagementSystem.API.Controllers
             return Success(response, "Report updated successfully");
         }
 
-        // PATCH api/report/{id}
+        [Authorize]
         [HttpPatch("{id}")]
         public async Task<IActionResult> Patch(int id, [FromBody] ReportRequest request)
         {
@@ -76,7 +82,7 @@ namespace StaffManagementSystem.API.Controllers
             return Success(response, "Report patched successfully");
         }
 
-        // DELETE api/report/{id}
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {

@@ -1,0 +1,55 @@
+<section class="bg0 p-t-104 p-b-116">
+  <div class="container">
+    <div class="flex-w flex-tr">
+      <div class="w-full">
+        <h3 class="mtext-105 cl2 txt-center p-b-30">Employees</h3>
+
+        <!-- Add Button -->
+        <div class="mb-3 text-end">
+          <button class="btn btn-primary" (click)="goToAdd()">➕ Add Employee</button>
+        </div>
+
+        <!-- Employees Table -->
+        <table class="table table-bordered table-striped">
+          <thead class="table-dark">
+            <tr>
+              <th>User Name</th>
+              <th>Email</th>
+              <th>Phone</th>
+              <th>Position</th>
+              <th>Nationality</th>
+              <th>National ID</th>
+              <th>Salary</th>
+              <th>Tasks</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let emp of employees">
+              <td>{{ emp.userName }}</td>
+              <td>{{ emp.email }}</td>
+              <td>{{ emp.phoneNumber }}</td>
+              <td>{{ emp.position }}</td>
+              <td>{{ emp.nationality }}</td>
+              <td>{{ emp.nationalId }}</td>
+              <td>{{ emp.salary | currency }}</td>
+              <td>
+                <span *ngIf="emp.tasks; else noTask">
+                  {{ emp.tasks.title }}
+                </span>
+                <ng-template #noTask>
+                  <em>No Task</em>
+                </ng-template>
+              </td>
+              <td>
+                <button class="btn btn-sm btn-warning me-2" (click)="goToEdit(emp.id)">
+                  ✏️ Edit
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>

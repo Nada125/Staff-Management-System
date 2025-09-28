@@ -1,0 +1,50 @@
+<section class="bg0 p-t-104 p-b-116">
+  <div class="container">
+    <div class="flex-w flex-tr">
+      <div class="size-210 bor10 p-lr-70 p-t-55 p-b-70 p-lr-15-lg w-full-md">
+        <form [formGroup]="myForm" (ngSubmit)="onSubmit()">
+          <h4 class="mtext-105 cl2 txt-center p-b-30">
+            {{ report ? 'Edit Report' : 'Add Report' }}
+          </h4>
+
+          <!-- Content -->
+          <div class="bor8 m-b-20">
+            <textarea
+              formControlName="content"
+              placeholder="Report Content"
+              class="stext-111 cl2 plh3 size-116 p-l-20 p-r-20"
+            ></textarea>
+          </div>
+
+          <!-- Submitted At -->
+          <div class="bor8 m-b-20">
+            <input
+              type="datetime-local"
+              formControlName="submittedAt"
+              class="stext-111 cl2 plh3 size-116 p-l-20 p-r-20"
+            />
+          </div>
+
+          <!-- Employee ID -->
+          <div class="bor8 m-b-20">
+            <input
+              type="text"
+              formControlName="employeeId"
+              placeholder="Employee ID"
+              class="stext-111 cl2 plh3 size-116 p-l-20 p-r-20"
+            />
+          </div>
+
+          <!-- Submit -->
+          <button
+            class="flex-c-m stext-101 cl0 size-121 bg3 bor1 hov-btn3 p-lr-15 trans-04 pointer"
+            type="submit"
+            [disabled]="myForm.invalid"
+          >
+            {{ report ? 'Update Report' : 'Add Report' }}
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,50 @@
+<section class="bg0 p-t-104 p-b-116">
+  <div class="container">
+    <div class="flex-w flex-tr">
+      <div class="w-full-md">
+        <h2 class="mtext-105 cl2 txt-center p-b-30">Reports Dashboard</h2>
+
+        <!-- Add Report Button -->
+        <div class="p-b-20">
+          <button
+            class="flex-c-m stext-101 cl0 size-121 bg3 bor1 hov-btn3 p-lr-15 trans-04 pointer"
+            (click)="goToAdd()"
+          >
+            Add Report
+          </button>
+        </div>
+
+        <!-- Reports Table -->
+        <div class="table-responsive">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>Content</th>
+                <th>Summary</th>
+                <th>Submitted At</th>
+                <th>Employee ID</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let report of reports">
+                <td>{{ report.content }}</td>
+                <td>{{ report.summary }}</td>
+                <td>{{ report.submittedAt | date : 'short' }}</td>
+                <td>{{ report.employeeId }}</td>
+                <td>
+                  <button
+                    class="flex-c-m stext-101 cl0 size-121 bg2 bor1 hov-btn2 p-lr-15 trans-04 pointer"
+                    (click)="goToEdit(report.id)"
+                  >
+                    Edit
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

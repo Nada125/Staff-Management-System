@@ -1,0 +1,78 @@
+<section class="bg0 p-t-104 p-b-116">
+  <div class="container">
+    <div class="flex-w flex-tr">
+      <div class="size-210 bor10 p-lr-70 p-t-55 p-b-70 p-lr-15-lg w-full-md">
+        <form [formGroup]="myForm" (ngSubmit)="onSubmit()">
+          <h4 class="mtext-105 cl2 txt-center p-b-30">
+            {{ task ? 'Edit Task' : 'Add Task' }}
+          </h4>
+
+          <!-- Title -->
+          <div class="bor8 m-b-20">
+            <input
+              type="text"
+              formControlName="title"
+              placeholder="Task Title"
+              class="stext-111 cl2 plh3 size-116 p-l-20 p-r-20"
+            />
+          </div>
+
+          <!-- Description -->
+          <div class="bor8 m-b-20">
+            <textarea
+              formControlName="description"
+              placeholder="Task Description"
+              class="stext-111 cl2 plh3 size-116 p-l-20 p-r-20"
+            ></textarea>
+          </div>
+
+          <!-- Assigned Date -->
+          <div class="bor8 m-b-20">
+            <input
+              type="datetime-local"
+              formControlName="assignedDate"
+              class="stext-111 cl2 plh3 size-116 p-l-20 p-r-20"
+            />
+          </div>
+
+          <!-- Due Date -->
+          <div class="bor8 m-b-20">
+            <input
+              type="datetime-local"
+              formControlName="dueDate"
+              class="stext-111 cl2 plh3 size-116 p-l-20 p-r-20"
+            />
+          </div>
+
+          <!-- Status -->
+          <div class="bor8 m-b-20">
+            <select formControlName="status" class="stext-111 cl2 plh3 size-116 p-l-20 p-r-20">
+              <option *ngFor="let status of taskStatuses" [value]="status">
+                {{ status }}
+              </option>
+            </select>
+          </div>
+
+          <!-- Employee ID -->
+          <div class="bor8 m-b-20">
+            <input
+              type="text"
+              formControlName="employeeId"
+              placeholder="Employee ID"
+              class="stext-111 cl2 plh3 size-116 p-l-20 p-r-20"
+            />
+          </div>
+
+          <!-- Submit -->
+          <button
+            class="flex-c-m stext-101 cl0 size-121 bg3 bor1 hov-btn3 p-lr-15 trans-04 pointer"
+            type="submit"
+            [disabled]="myForm.invalid"
+          >
+            {{ task ? 'Update Task' : 'Add Task' }}
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>

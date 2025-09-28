@@ -1,0 +1,92 @@
+<section class="bg0 p-t-104 p-b-116">
+  <div class="container">
+    <div class="flex-w flex-tr">
+      <div class="size-210 bor10 p-lr-70 p-t-55 p-b-70 p-lr-15-lg w-full-md">
+        <form [formGroup]="myForm" (ngSubmit)="onSubmit()">
+          <h4 class="mtext-105 cl2 txt-center p-b-30">
+            {{ employee ? 'Edit Employee' : 'Add Employee' }}
+          </h4>
+
+          <!-- User Name -->
+          <div class="bor8 m-b-20">
+            <input
+              type="text"
+              formControlName="userName"
+              placeholder="User Name"
+              class="stext-111 cl2 plh3 size-116 p-l-20 p-r-20"
+            />
+          </div>
+
+          <!-- Email -->
+          <div class="bor8 m-b-20">
+            <input
+              type="email"
+              formControlName="email"
+              placeholder="Email"
+              class="stext-111 cl2 plh3 size-116 p-l-20 p-r-20"
+            />
+          </div>
+
+          <!-- Phone -->
+          <div class="bor8 m-b-20">
+            <input
+              type="text"
+              formControlName="phoneNumber"
+              placeholder="Phone Number"
+              class="stext-111 cl2 plh3 size-116 p-l-20 p-r-20"
+            />
+          </div>
+
+          <!-- Position -->
+          <div class="bor8 m-b-20">
+            <input
+              type="text"
+              formControlName="position"
+              placeholder="Position"
+              class="stext-111 cl2 plh3 size-116 p-l-20 p-r-20"
+            />
+          </div>
+
+          <!-- Nationality -->
+          <div class="bor8 m-b-20">
+            <input
+              type="text"
+              formControlName="nationality"
+              placeholder="Nationality"
+              class="stext-111 cl2 plh3 size-116 p-l-20 p-r-20"
+            />
+          </div>
+
+          <!-- National ID -->
+          <div class="bor8 m-b-20">
+            <input
+              type="text"
+              formControlName="nationalId"
+              placeholder="National ID"
+              class="stext-111 cl2 plh3 size-116 p-l-20 p-r-20"
+            />
+          </div>
+
+          <!-- Salary -->
+          <div class="bor8 m-b-20">
+            <input
+              type="number"
+              formControlName="salary"
+              placeholder="Salary"
+              class="stext-111 cl2 plh3 size-116 p-l-20 p-r-20"
+            />
+          </div>
+
+          <!-- Submit -->
+          <button
+            class="flex-c-m stext-101 cl0 size-121 bg3 bor1 hov-btn3 p-lr-15 trans-04 pointer"
+            type="submit"
+            [disabled]="myForm.invalid"
+          >
+            {{ employee ? 'Update Employee' : 'Add Employee' }}
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>

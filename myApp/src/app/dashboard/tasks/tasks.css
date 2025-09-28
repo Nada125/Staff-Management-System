@@ -1,0 +1,57 @@
+.task-container {
+  padding: 20px;
+}
+
+h2 {
+  margin-bottom: 15px;
+}
+
+.add-btn {
+  margin-bottom: 10px;
+  padding: 6px 12px;
+  background-color: #007bff;
+  border: none;
+  color: white;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.task-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.task-table th,
+.task-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.task-table th {
+  background-color: #f4f4f4;
+}
+
+.edit-btn {
+  padding: 5px 10px;
+  background-color: #28a745;
+  border: none;
+  color: white;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.status-completed {
+  color: green;
+  font-weight: bold;
+}
+
+.status-progress {
+  color: orange;
+  font-weight: bold;
+}
+
+.status-review {
+  color: red;
+  font-weight: bold;
+}

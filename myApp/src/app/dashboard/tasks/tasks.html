@@ -1,0 +1,46 @@
+<div class="task-container">
+  <h2>Tasks Dashboard</h2>
+
+  <button (click)="goToAdd()" class="add-btn">+ Add Task</button>
+
+  <table class="task-table" *ngIf="tasks.length > 0; else noTasks">
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th>Description</th>
+        <th>Assigned Date</th>
+        <th>Due Date</th>
+        <th>Status</th>
+        <th>Employee</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let task of tasks">
+        <td>{{ task.title }}</td>
+        <td>{{ task.description }}</td>
+        <td>{{ task.assignedDate | date }}</td>
+        <td>{{ task.dueDate ? (task.dueDate | date) : 'N/A' }}</td>
+        <td>
+          <span
+            [ngClass]="{
+              'status-completed': task.status === 'Completed',
+              'status-progress': task.status === 'InProgress',
+              'status-review': task.status === 'NeedReview'
+            }"
+          >
+            {{ task.status }}
+          </span>
+        </td>
+        <td>{{ task.employeeId }}</td>
+        <td>
+          <button (click)="goToEdit(task.id)" class="edit-btn">Edit</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <ng-template #noTasks>
+    <p>No tasks available.</p>
+  </ng-template>
+</div>

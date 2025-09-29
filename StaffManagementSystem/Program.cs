@@ -192,7 +192,7 @@ namespace StaffManagementSystem
             using (var s = app.Services.CreateScope())
             {
                 var roleManager = s.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-                string[] roles = { "Employee", "Manager" };
+                string[] roles = { "Employee", "Manager"};
 
                 foreach (var role in roles)
                 {

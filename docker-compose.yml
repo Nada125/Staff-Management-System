@@ -4,13 +4,10 @@ networks:
    
 services:
   staffmanagementsystem.api:
-    container_name: staff-management-api
     image: ${DOCKER_REGISTRY-}staffmanagementsystemapi
     build:
       context: .
       dockerfile: StaffManagementSystem/Dockerfile
-    ports:
-      - "5000:8080"   # API exposed at http://localhost:5000
     depends_on:
       - staffmanagementdb
     environment:
@@ -19,7 +16,6 @@ services:
     networks:
       - staffmanagement
   staffmanagementdb: 
-    container_name: staff-management-db
     image: postgres:16
     restart: always
     ports:

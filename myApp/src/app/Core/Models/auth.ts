@@ -6,6 +6,7 @@ export interface IRegister {
   nationalId: string;
   password: string;
   confirmPassword: string;
+  role?: string;
 }
 
 export interface ILogin {

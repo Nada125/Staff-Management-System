@@ -18,11 +18,11 @@ export class AuthService {
 
   private isAuth = new BehaviorSubject<IUserData | null>(null);
   public isAuth$ = this.isAuth.asObservable();
-  private url = environment.apiURL + '/user';
+  private url = environment.apiURL + '/Auth';
   private token_key = 'token';
 
   register(user: IRegister) {
-    return this._http.post<IRegister>(this.url, user);
+    return this._http.post<IRegister>(`${this.url}/register`, user);
   }
 
   login(data: ILogin) {
@@ -47,15 +47,36 @@ export class AuthService {
     );
   }
 
+  // Verify code
+  verifyCode(email: string, code: string, purpose: 'EmailVerification' | 'PasswordReset') {
+    return this._http.post(`${this.url}/verify-code`, { email, code, purpose });
+  }
+
+  // Request password reset code
+  forgotPassword(email: string) {
+    return this._http.post(`${this.url}/forgot-password`, { email });
+  }
+
+  // Reset password with verification code
+  resetPassword(email: string, code: string, newPassword: string, confirmPassword: string) {
+    return this._http.post(`${this.url}/reset-password`, {
+      email,
+      code,
+      newPassword,
+      confirmPassword,
+    });
+  }
+
   loginRouting(role: string) {
     const query = this._activatedRoute.snapshot.queryParams;
     if (query) {
-      const isManageRoute = query['returnurl'].startsWith('/dashboard');
-      const isEmployeeRoute = query['returnurl'].startsWith('/home');
+      const isManageRoute = query['returnurl']?.startsWith('/dashboard');
+      const isEmployeeRoute = query['returnurl']?.startsWith('/home');
       if (role === 'Manager' && isManageRoute) {
+        this._router.navigate([query['returnurl']]);
       }
       if (role === 'Employee' && isEmployeeRoute) {
-        this._router.navigate([query]);
+        this._router.navigate([query['returnurl']]);
       }
     } else {
       if (role === 'Manager') {
@@ -64,13 +85,10 @@ export class AuthService {
         this._router.navigate(['/home']);
       }
     }
-
-    console.log(query);
   }
 
   isLoggedin(): IUserData | null {
     const token = this.getToken();
-    console.log('islog', token);
     if (token) {
       const decode = this.decodeToken(token);
       return decode;
@@ -84,10 +102,18 @@ export class AuthService {
 
   isUserLoggedin(): boolean {
     const token = this.getToken();
-    if (token) {
-      return true;
-    }
-    return false;
+    if (!token) return false;
+
+    const decoded = this.decodeToken(token);
+    return decoded !== null;
+  }
+
+  isTokenExpired(): boolean {
+    const token = this.getToken();
+    if (!token) return true;
+
+    const decoded = this.decodeToken(token);
+    return decoded === null;
   }
 
   logout() {
@@ -100,7 +126,7 @@ export class AuthService {
     console.log('routes', routes);
 
     if (isSecure === true) {
-      this._router.navigate(['/login']);
+      this._router.navigate(['/Auth/login']);
     }
   }
 
@@ -132,6 +158,7 @@ export class AuthService {
       }
       return null;
     } catch (err) {
+      console.error('Error decoding token:', err);
       return null;
     }
   }
@@ -143,8 +170,6 @@ export class AuthService {
   }
 
   getToken() {
-    console.log('stored token', localStorage.getItem(this.token_key));
-
     return localStorage.getItem(this.token_key);
   }
 

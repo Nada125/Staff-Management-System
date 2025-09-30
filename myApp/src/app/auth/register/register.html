@@ -1,0 +1,125 @@
+<div class="d-flex justify-content-center align-items-center vh-100">
+  <form
+    [formGroup]="registerForm"
+    (ngSubmit)="onSubmit()"
+    class="p-4 shadow rounded bg-white"
+    style="width: 400px"
+  >
+    <h4 class="mtext-105 cl2 txt-center p-b-30">Register</h4>
+
+    <!-- UserName -->
+    <div class="bor8 m-b-20">
+      <input
+        type="text"
+        class="stext-111 cl2 plh3 size-116 p-l-30 p-r-30"
+        formControlName="userName"
+        placeholder="Your Name"
+      />
+      <div
+        *ngIf="registerForm.get('userName')?.touched && registerForm.get('userName')?.invalid"
+        class="text-danger"
+      >
+        Name is required (min 5 chars)
+      </div>
+    </div>
+
+    <div class="bor8 m-b-20">
+      <input
+        type="text"
+        class="stext-111 cl2 plh3 size-116 p-l-30 p-r-30"
+        formControlName="email"
+        placeholder="Email"
+      />
+      <div
+        *ngIf="registerForm.get('email')?.touched && registerForm.get('email')?.invalid"
+        class="text-danger"
+      >
+        Email is required
+      </div>
+    </div>
+
+    <!-- Phone -->
+    <div class="bor8 m-b-20">
+      <input
+        type="text"
+        class="stext-111 cl2 plh3 size-116 p-l-30 p-r-30"
+        formControlName="phoneNumber"
+        placeholder="Phone Number"
+      />
+      <div
+        *ngIf="registerForm.get('phoneNumber')?.touched && registerForm.get('phoneNumber')?.invalid"
+        class="text-danger"
+      >
+        Phone is required
+      </div>
+    </div>
+
+    <!-- Nationality -->
+    <div class="bor8 m-b-20">
+      <input
+        type="text"
+        class="stext-111 cl2 plh3 size-116 p-l-30 p-r-30"
+        formControlName="nationality"
+        placeholder="Nationality"
+      />
+    </div>
+
+    <!-- National ID -->
+    <div class="bor8 m-b-20">
+      <input
+        type="text"
+        class="stext-111 cl2 plh3 size-116 p-l-30 p-r-30"
+        formControlName="nationalId"
+        placeholder="National ID"
+      />
+      <div
+        *ngIf="registerForm.get('nationalId')?.touched && registerForm.get('nationalId')?.invalid"
+        class="text-danger"
+      >
+        National ID must be 14 digits
+      </div>
+    </div>
+
+    <!-- Password -->
+    <div class="bor8 m-b-20">
+      <input
+        type="password"
+        class="stext-111 cl2 plh3 size-116 p-l-30 p-r-30"
+        formControlName="password"
+        placeholder="Password"
+      />
+    </div>
+
+    <!-- Confirm Password -->
+    <div class="bor8 m-b-20">
+      <input
+        type="password"
+        class="stext-111 cl2 plh3 size-116 p-l-30 p-r-30"
+        formControlName="confirmPassword"
+        placeholder="Confirm Password"
+      />
+      <div
+        *ngIf="
+          registerForm.get('confirmPassword')?.touched &&
+          registerForm.get('confirmPassword')?.invalid
+        "
+        class="text-danger"
+      >
+        Confirm password is required
+      </div>
+    </div>
+    <!-- Role (hidden or selectable) -->
+    <input type="hidden" formControlName="role" />
+
+    <!-- Error message -->
+    <div *ngIf="msg" class="text-danger m-b-15 text-center">{{ msg }}</div>
+
+    <!-- Submit button -->
+    <button
+      type="submit"
+      class="flex-c-m stext-101 cl0 size-121 bg3 bor1 hov-btn3 p-lr-15 trans-04 pointer"
+    >
+      Register
+    </button>
+  </form>
+</div>

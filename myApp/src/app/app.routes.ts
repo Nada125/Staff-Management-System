@@ -6,10 +6,23 @@ import { Task } from './dashboard/tasks/tasks';
 import { TaskForm } from './dashboard/tasks/task-form/task-form';
 import { Report } from './dashboard/reports/reports';
 import { ReportForm } from './dashboard/reports/report-form/report-form';
+import { Auth } from './auth/auth';
+import { Login } from './auth/login/login';
+import { Register } from './auth/register/register';
+import { managerGuard } from './Core/Guards/manager-guard';
 
 export const routes: Routes = [
   {
+    path: '',
+    component: Auth,
+    children: [
+      { path: 'login', component: Login },
+      { path: 'register', component: Register },
+    ],
+  },
+  {
     path: 'dashboard',
+    canMatch: [managerGuard],
     component: Dashboard,
     children: [
       {

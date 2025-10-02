@@ -107,6 +107,9 @@
       >
         Confirm password is required
       </div>
+      <div *ngIf="registerForm.errors?.['passwordMismatch']" class="error-msg">
+        Password and Confirm Password do not match
+      </div>
     </div>
     <!-- Role (hidden or selectable) -->
     <input type="hidden" formControlName="role" />

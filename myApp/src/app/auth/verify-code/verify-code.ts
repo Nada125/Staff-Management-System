@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -6,19 +6,14 @@ import { AuthService } from '../../Core/Services/auth-service';
 
 @Component({
   selector: 'app-verify-code',
+  standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './verify-code.html',
-  styleUrl: './verify-code.css',
+  styleUrls: ['./verify-code.css'],
 })
-export class VerifyCode {
-  constructor(
-    private _auth: AuthService,
-    private _router: Router,
-    private _route: ActivatedRoute
-  ) {}
-
+export class VerifyCode implements OnInit {
   msg = '';
-  purpose = '';
+  purpose: 'EmailVerification' | 'PasswordReset' = 'EmailVerification';
   email = '';
 
   verifyCodeForm = new FormGroup({
@@ -30,16 +25,19 @@ export class VerifyCode {
     ]),
   });
 
+  constructor(
+    private _auth: AuthService,
+    private _router: Router,
+    private _route: ActivatedRoute
+  ) {}
+
   ngOnInit() {
-    // Get purpose from query params
     this._route.queryParams.subscribe((params) => {
       this.purpose = params['purpose'] || 'EmailVerification';
 
-      // Get email from localStorage
       const storedEmail = localStorage.getItem('resetEmail');
       this.email = storedEmail || '';
 
-      // If no email found, redirect to appropriate page
       if (!this.email) {
         if (this.purpose === 'PasswordReset') {
           this._router.navigate(['/forgot-password']);
@@ -51,26 +49,22 @@ export class VerifyCode {
   }
 
   onSubmit() {
-    if (this.verifyCodeForm.valid) {
-      const code = this.verifyCodeForm.get('code')?.value;
-      if (!code || !this.email) return;
+    if (this.verifyCodeForm.invalid || !this.email) return;
 
-      this._auth.verifyCode(this.email, code, this.purpose as any).subscribe({
-        next: (data) => {
-          console.log('Code verified:', data);
+    const code = this.verifyCodeForm.get('code')?.value!;
+    this._auth.verifyCode(this.email, code, this.purpose).subscribe({
+      next: (data) => {
+        console.log('Code verified:', data);
 
-          if (this.purpose === 'PasswordReset') {
-            // Navigate to reset password page
-            this._router.navigate(['/reset-password']);
-          } else {
-            // For email verification, navigate to login
-            this._router.navigate(['/login']);
-          }
-        },
-        error: (err) => {
-          this.msg = err.error?.message || 'Invalid verification code';
-        },
-      });
-    }
+        if (this.purpose === 'PasswordReset') {
+          this._router.navigate(['/reset-password']);
+        } else {
+          this._router.navigate(['/login']);
+        }
+      },
+      error: (err) => {
+        this.msg = err.error?.message || 'Invalid verification code';
+      },
+    });
   }
 }

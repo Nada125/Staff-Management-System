@@ -1,1 +1,48 @@
-<p>verify-code works!</p>
+<div class="verify-container">
+  <h2 class="title">
+    {{ purpose === 'PasswordReset' ? 'Reset Password Verification' : 'Email Verification' }}
+  </h2>
+
+  <p class="info-text">
+    A verification code has been sent to <strong>{{ email }}</strong>
+  </p>
+
+  <form [formGroup]="verifyCodeForm" (ngSubmit)="onSubmit()">
+    <!-- Code Input -->
+    <div class="form-group">
+      <label for="code">Enter Verification Code</label>
+      <input
+        id="code"
+        type="text"
+        maxlength="6"
+        formControlName="code"
+        class="form-control"
+        placeholder="6-digit code"
+      />
+
+      <!-- Validation Messages -->
+      <div
+        *ngIf="verifyCodeForm.get('code')?.touched && verifyCodeForm.get('code')?.invalid"
+        class="error"
+      >
+        <small *ngIf="verifyCodeForm.get('code')?.errors?.['required']">Code is required</small>
+        <small
+          *ngIf="verifyCodeForm.get('code')?.errors?.['minlength'] || verifyCodeForm.get('code')?.errors?.['maxlength']"
+        >
+          Code must be exactly 6 digits
+        </small>
+        <small *ngIf="verifyCodeForm.get('code')?.errors?.['pattern']">
+          Code must contain only numbers
+        </small>
+      </div>
+    </div>
+
+    <!-- Error Message from API -->
+    <div *ngIf="msg" class="error-msg">
+      {{ msg }}
+    </div>
+
+    <!-- Submit -->
+    <button type="submit" class="btn" [disabled]="verifyCodeForm.invalid">Verify</button>
+  </form>
+</div>

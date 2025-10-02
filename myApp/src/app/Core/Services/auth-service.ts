@@ -48,9 +48,18 @@ export class AuthService {
   }
 
   // Verify code
-  verifyCode(email: string, code: string, purpose: 'EmailVerification' | 'PasswordReset') {
-    return this._http.post(`${this.url}/verify-code`, { email, code, purpose });
-  }
+  verifyCode(Email: string, Code: string, Purpose: 'EmailVerification' | 'PasswordReset') {
+  const purposeMap: Record<'EmailVerification' | 'PasswordReset', number> = {
+    EmailVerification: 0,
+    PasswordReset: 1,
+  };
+
+  return this._http.post(`${this.url}/verify-code`, {
+    Email,
+    Code,
+    Purpose: purposeMap[Purpose],
+  });
+}
 
   // Request password reset code
   forgotPassword(email: string) {

@@ -10,6 +10,9 @@ import { Auth } from './auth/auth';
 import { Login } from './auth/login/login';
 import { Register } from './auth/register/register';
 import { managerGuard } from './Core/Guards/manager-guard';
+import { VerifyCode } from './auth/verify-code/verify-code';
+import { ForgotPassword } from './auth/forgot-password/forgot-password';
+import { ResetPassword } from './auth/reset-password/reset-password';
 
 export const routes: Routes = [
   {
@@ -18,6 +21,9 @@ export const routes: Routes = [
     children: [
       { path: 'login', component: Login },
       { path: 'register', component: Register },
+      { path: 'verify-code', component: VerifyCode },
+      { path: 'forgot-password', component: ForgotPassword },
+      { path: 'reset-password', component: ResetPassword },
     ],
   },
   {

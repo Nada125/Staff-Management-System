@@ -39,6 +39,7 @@ export class ResetPassword {
   // Fixed form group initialization
   resetPasswordForm = new FormGroup(
     {
+      email: new FormControl(''),
       code: new FormControl('', [
         Validators.required,
         Validators.minLength(6),

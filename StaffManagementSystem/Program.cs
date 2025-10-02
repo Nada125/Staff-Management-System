@@ -11,6 +11,7 @@ using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using DotNetEnv;
 
 
 namespace StaffManagementSystem
@@ -20,6 +21,8 @@ namespace StaffManagementSystem
         public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+            Env.Load();
+
 
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -76,7 +79,22 @@ namespace StaffManagementSystem
             .AddDefaultTokenProviders();
 
 
-            builder.Services.Configure<JWT>(builder.Configuration.GetSection("JwtConfig"));
+            builder.Services.Configure<JWT>(options =>
+            {
+                options.Issuer = Environment.GetEnvironmentVariable("JWT_ISSUER") ?? "";
+                options.Audience = Environment.GetEnvironmentVariable("JWT_AUDIENCE") ?? "";
+                options.Key = Environment.GetEnvironmentVariable("JWT_KEY") ?? "";
+                options.DurationInDays = int.TryParse(Environment.GetEnvironmentVariable("JWT_DURATION"), out var days) ? days : 30;
+            });
+
+            builder.Services.Configure<Email>(options =>
+            {
+                options.Host = Environment.GetEnvironmentVariable("EMAIL_HOST") ?? "smtp.gmail.com";
+                options.User = Environment.GetEnvironmentVariable("EMAIL_USER") ?? "";
+                options.Pass = Environment.GetEnvironmentVariable("EMAIL_PASS") ?? "";
+            });
+
+
             builder.Services.AddAutoMapper(typeof(EmployeeProfile).Assembly);
             builder.Services.AddScoped(typeof(IGenericRepository<,>), typeof(GenericRepository<,>));
             builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
@@ -87,12 +105,23 @@ namespace StaffManagementSystem
             builder.Services.AddScoped<IEmailService, EmailService>();
             builder.Services.AddScoped<IReportAiService, ReportAiService>();
 
-            // Bind Google AI config
-            builder.Services.Configure<GoogleAiOptions>(builder.Configuration.GetSection("GoogleAI"));
+
+            // Google AI
+            builder.Services.Configure<GoogleAiOptions>(options =>
+            {
+                options.ApiKey = Environment.GetEnvironmentVariable("GOOGLE_API_KEY") ?? "";
+                options.Model = Environment.GetEnvironmentVariable("GOOGLE_MODEL") ?? "gemini-2.5-flash";
+                options.BaseUrl = Environment.GetEnvironmentVariable("GOOGLE_BASE_URL") ?? "https://generativelanguage.googleapis.com";
+                options.Temperature = double.TryParse(Environment.GetEnvironmentVariable("GOOGLE_TEMPERATURE"), out var temp) ? temp : 0.7;
+                options.MaxOutputTokens = int.TryParse(Environment.GetEnvironmentVariable("GOOGLE_MAX_OUTPUT_TOKENS"), out var tokens) ? tokens : 2048;
+            });
 
             // Register HttpClient for Google AI
-            builder.Services.AddHttpClient("google-ai");
-
+            builder.Services.AddHttpClient("google-ai", client =>
+            {
+                var baseUrl = Environment.GetEnvironmentVariable("GOOGLE_BASE_URL") ?? "https://generativelanguage.googleapis.com";
+                client.BaseAddress = new Uri(baseUrl);
+            });
 
 
             builder.Services.AddAuthentication(options =>
@@ -108,37 +137,44 @@ namespace StaffManagementSystem
             {
                 options.RequireHttpsMetadata = false;
                 options.SaveToken = true;
+
+                var issuer = Environment.GetEnvironmentVariable("JWT_ISSUER");
+                var audience = Environment.GetEnvironmentVariable("JWT_AUDIENCE");
+                var key = Environment.GetEnvironmentVariable("JWT_KEY");
+
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
-                    ValidIssuer = builder.Configuration["JwtConfig:Issuer"],
-                    ValidAudience = builder.Configuration["JwtConfig:Audience"],
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtConfig:Key"]!)),
+                    ValidIssuer = issuer,
+                    ValidAudience = audience,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key ?? string.Empty)),
                     ValidateIssuer = true,
                     ValidateAudience = true,
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
-
-
                     ClockSkew = TimeSpan.Zero
-
                 };
-
             });
+
+            // Add CORS services
             builder.Services.AddCors(options =>
             {
-                options.AddDefaultPolicy(policy =>
+                options.AddPolicy("AllowAngularApp", policy =>
                 {
-                    policy.AllowAnyOrigin()
+                    policy.WithOrigins("http://localhost:4200") 
                           .AllowAnyHeader()
                           .AllowAnyMethod();
                 });
             });
 
+
             //var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
             //    ?? Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection");
 
-            var connectionString = Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection")
-                                   ?? builder.Configuration.GetConnectionString("DefaultConnection");
+            var connectionString = $"Host={Environment.GetEnvironmentVariable("DB_HOST")};" +
+                       $"Port={Environment.GetEnvironmentVariable("DB_PORT")};" +
+                       $"Database={Environment.GetEnvironmentVariable("DB_NAME")};" +
+                       $"Username={Environment.GetEnvironmentVariable("DB_USER")};" +
+                       $"Password={Environment.GetEnvironmentVariable("DB_PASS")}";
 
             if (string.IsNullOrWhiteSpace(connectionString))
             {
@@ -154,6 +190,7 @@ namespace StaffManagementSystem
                 maxRetryCount: 5,
                 maxRetryDelay: TimeSpan.FromSeconds(10),
                 errorCodesToAdd: null);
+            
             }));
 
             var app = builder.Build();
@@ -214,7 +251,7 @@ namespace StaffManagementSystem
             {
                 app.UseHttpsRedirection();
             }
-            app.UseCors();
+            app.UseCors("AllowAngularApp");
             
 
             app.UseAuthorization();

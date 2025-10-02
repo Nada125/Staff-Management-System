@@ -41,24 +41,26 @@ namespace StaffManagementSystem.Application.Services
             return await CallGenerateAsync(combinedPrompt, cancellationToken);
         }
 
-        private async Task<string> CallGenerateAsync(string prompt, CancellationToken cancellationToken)
+        private async Task<string> CallGenerateAsync(string reportText, CancellationToken cancellationToken)
         {
             var client = _httpFactory.CreateClient("google-ai");
             var url = $"{_opts.BaseUrl}/v1beta/models/{_opts.Model}:generateContent?key={_opts.ApiKey}";
 
+            var prompt = "You are an assistant that summarizes reports into clear and concise text.";
+
             var body = new
             {
                 contents = new[]
-                {
-            new
+     {
+        new
+        {
+            role = "user",
+            parts = new[]
             {
-                role = "user",
-                parts = new[]
-                {
-                    new { text = prompt }
-                }
+                new { text = $"Summarize this report in 3-4 sentences, focusing only on the main points:\n\n{prompt}" }
             }
-        },
+        }
+    },
                 generationConfig = new
                 {
                     temperature = _opts.Temperature,
@@ -66,11 +68,13 @@ namespace StaffManagementSystem.Application.Services
                 }
             };
 
+
+
+
             var req = new HttpRequestMessage(HttpMethod.Post, url)
             {
                 Content = new StringContent(JsonSerializer.Serialize(body, _jsonOptions), Encoding.UTF8, "application/json")
             };
-            var jsonBody = JsonSerializer.Serialize(body, _jsonOptions);
 
             var res = await client.SendAsync(req, cancellationToken);
             var payload = await res.Content.ReadAsStringAsync(cancellationToken);
@@ -84,6 +88,7 @@ namespace StaffManagementSystem.Application.Services
             using var doc = JsonDocument.Parse(payload);
             return TryExtractGeneratedText(doc, out var text) ? text : payload;
         }
+
 
         private bool TryExtractGeneratedText(JsonDocument doc, out string text)
         {

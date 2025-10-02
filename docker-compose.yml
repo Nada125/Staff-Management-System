@@ -1,7 +1,8 @@
-version: '3.4'
+version: '3.8'
+
 networks:
-    staffmanagement:
-   
+  staffmanagement:
+
 services:
   staffmanagementsystem.api:
     image: ${DOCKER_REGISTRY-}staffmanagementsystemapi
@@ -12,9 +13,13 @@ services:
       - staffmanagementdb
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080
       - ConnectionStrings__DefaultConnection=Host=staffmanagementdb;Port=5432;Database=StaffManagementSystem;Username=staffuser;Password=staffpass
     networks:
       - staffmanagement
+    ports:
+      - "5000:8080"  # Single port mapping for HTTP
+
   staffmanagementdb: 
     image: postgres:16
     restart: always
@@ -28,6 +33,17 @@ services:
       - staffmanagement
     volumes:
       - postgres_data:/var/lib/postgresql/data
+
+  staffmanagementsystem.ui:   
+    build:
+      context: ../../StaffManagementSystemFront/myApp    
+      dockerfile: Dockerfile
+    ports:
+      - "4200:80"
+    depends_on:
+      - staffmanagementsystem.api
+    networks:
+      - staffmanagement
 
 volumes:
   postgres_data:

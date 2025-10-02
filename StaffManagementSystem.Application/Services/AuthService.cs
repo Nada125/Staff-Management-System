@@ -56,7 +56,7 @@ namespace StaffManagementSystem.Application.Services
 
             var code = RandomNumberGenerator.GetInt32(100000, 1000000).ToString();
             user.VerificationCode = code;
-            user.VerificationCodeExpiresAt = DateTime.UtcNow.AddMinutes(15);
+            user.VerificationCodeExpiresAt = DateTime.UtcNow.AddMinutes(1);
             await _userManager.UpdateAsync(user);
 
             try

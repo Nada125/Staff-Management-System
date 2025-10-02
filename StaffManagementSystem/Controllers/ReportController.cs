@@ -18,7 +18,7 @@ namespace StaffManagementSystem.API.Controllers
             _aiService = aiService;
         }
 
-        [Authorize(Roles = "Manager")]
+        //[Authorize(Roles = "Manager")]
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -37,7 +37,7 @@ namespace StaffManagementSystem.API.Controllers
             return Success(response, "Report retrieved successfully");
         }
 
-        [Authorize]
+        //[Authorize]
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] ReportRequest request)
         {

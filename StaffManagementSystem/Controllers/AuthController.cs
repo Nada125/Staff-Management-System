@@ -15,7 +15,7 @@ namespace StaffManagementSystem.API.Controllers
             _authService = authService;
         }
 
-        [HttpPost("signUp")]
+        [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterDto dto)
         {
             var result = await _authService.RegisterAsync(dto);
@@ -35,7 +35,7 @@ namespace StaffManagementSystem.API.Controllers
                 : Error(result.Message);
         }
 
-        [HttpPost("signIn")]
+        [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto model)
         {
             var result = await _authService.LoginAsync(model);

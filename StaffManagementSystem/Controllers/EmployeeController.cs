@@ -17,7 +17,7 @@ public class EmployeeController : BaseController
     }
 
 
-    [Authorize(Roles ="Manager")]
+    //[Authorize(Roles ="Manager")]
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {

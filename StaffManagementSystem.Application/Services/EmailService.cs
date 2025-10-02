@@ -1,23 +1,22 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using MailKit.Net.Smtp;
+﻿using MailKit.Net.Smtp;
 using MailKit.Security;
 using MimeKit;
 using MimeKit.Text;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using StaffManagementSystem.Application.DTOs.Auth;
 using StaffManagementSystem.Application.Interfaces;
-
 
 namespace StaffManagementSystem.Application.Services
 {
     public class EmailService : IEmailService
     {
-        private readonly IConfiguration _config;
+        private readonly Email _emailConfig;
         private readonly ILogger<EmailService> _logger;
 
-        public EmailService(IConfiguration config, ILogger<EmailService> logger)
+        public EmailService(IOptions<Email> emailConfig, ILogger<EmailService> logger)
         {
-            _config = config;
+            _emailConfig = emailConfig.Value;
             _logger = logger;
         }
 
@@ -26,14 +25,14 @@ namespace StaffManagementSystem.Application.Services
             try
             {
                 var email = new MimeMessage();
-                email.From.Add(MailboxAddress.Parse(_config["Email:Username"]));
+                email.From.Add(MailboxAddress.Parse(_emailConfig.User));
                 email.To.Add(MailboxAddress.Parse(request.To));
                 email.Subject = request.Subject;
                 email.Body = new TextPart(TextFormat.Plain) { Text = request.Body };
 
                 using var smtp = new SmtpClient();
-                await smtp.ConnectAsync(_config["Email:Host"], 587, SecureSocketOptions.StartTls);
-                await smtp.AuthenticateAsync(_config["Email:Username"], _config["Email:Password"]);
+                await smtp.ConnectAsync(_emailConfig.Host, 587, SecureSocketOptions.StartTls);
+                await smtp.AuthenticateAsync(_emailConfig.User, _emailConfig.Pass);
                 await smtp.SendAsync(email);
                 await smtp.DisconnectAsync(true);
 
